@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/internships", label: "Internships" },
   { href: "/internships/new", label: "Add internship" },
+  { href: "/review", label: "Review" },
 ];
 
 export default function Navbar() {

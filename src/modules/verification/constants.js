@@ -5,6 +5,12 @@ export const RISK_LEVELS = ["low", "medium", "high"];
 // Decision a human reviewer can make.
 export const REVIEW_DECISIONS = ["verified_safe", "confirmed_suspicious"];
 
+// Text shown in the UI for each decision.
+export const DECISION_LABELS = {
+  verified_safe: "Verified safe",
+  confirmed_suspicious: "Marked suspicious",
+};
+
 // A reviewer's decision overrides the automatic level:
 // verified_safe → "low", confirmed_suspicious → "high"
 export const FINAL_STATUS_FOR_DECISION = {

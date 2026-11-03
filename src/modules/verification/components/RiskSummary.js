@@ -7,9 +7,9 @@ import RiskBadge from "./RiskBadge";
 import ReasonList from "./ReasonList";
 import ReviewForm from "./ReviewForm";
 import { fetchVerification, evaluateVerification } from "../verificationApi";
+import { DECISION_LABELS } from "../constants";
 
 const BAR_COLORS = { low: "bg-green-500", medium: "bg-yellow-500", high: "bg-red-500" };
-const DECISION_TEXT = { verified_safe: "Verified safe", confirmed_suspicious: "Marked suspicious" };
 
 function formatDate(isoString) {
   return new Date(isoString).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -137,7 +137,7 @@ export default function RiskSummary({ internshipId }) {
       {review && (
         <div className="rounded-md border border-blue-200 bg-blue-50 p-4 text-sm">
           <p className="font-medium">
-            {DECISION_TEXT[review.decision]} by {review.reviewerName} on {formatDate(review.reviewedAt)}
+            {DECISION_LABELS[review.decision]} by {review.reviewerName} on {formatDate(review.reviewedAt)}
           </p>
           {review.note && <p className="mt-1 text-gray-700">{review.note}</p>}
           {v.finalStatus !== v.riskLevel && (
