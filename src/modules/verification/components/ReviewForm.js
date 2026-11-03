@@ -25,7 +25,10 @@ function issuesToErrors(issues) {
 //   internshipId → which listing is being reviewed
 //   onReviewed   → function(updatedVerification), called after a successful save
 //   onCancel     → function(), closes the form
-export default function ReviewForm({ internshipId, onReviewed, onCancel }) {
+//   reviewerKey  → OPTIONAL. The dashboard already knows the key, so it passes it
+//                  here and the key box is hidden. On a detail page it is not passed,
+//                  so the reviewer types it.
+export default function ReviewForm({ internshipId, onReviewed, onCancel, reviewerKey: savedKey = "" }) {
   const [values, setValues] = useState({ reviewerKey: "", reviewerName: "", decision: "", note: "" });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -41,11 +44,14 @@ export default function ReviewForm({ internshipId, onReviewed, onCancel }) {
     event.preventDefault();
     setSubmitError("");
 
+    // Use the key given by the dashboard, or the one typed in the box.
+    const { reviewerKey: typedKey, ...reviewData } = values;
+    const key = (savedKey || typedKey).trim();
+
     // 1. Check in the browser first (same Zod rules as the API).
-    const { reviewerKey, ...reviewData } = values; // the key is not part of the review itself
     const result = reviewSchema.safeParse({ ...reviewData, decision: values.decision || undefined });
     const newErrors = result.success ? {} : issuesToErrors(result.error.issues);
-    if (!reviewerKey.trim()) newErrors.reviewerKey = "Reviewer key is required";
+    if (!key) newErrors.reviewerKey = "Reviewer key is required";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -54,11 +60,12 @@ export default function ReviewForm({ internshipId, onReviewed, onCancel }) {
     // 2. Send it to the API.
     setSubmitting(true);
     try {
-      const updated = await submitReview(internshipId, result.data, reviewerKey.trim());
+      const updated = await submitReview(internshipId, result.data, key);
       onReviewed(updated);
     } catch (error) {
       if (error.code === "UNAUTHORIZED") {
-        setErrors({ reviewerKey: "Wrong reviewer key" });
+        if (savedKey) setSubmitError("The reviewer key was rejected. Sign out and enter it again.");
+        else setErrors({ reviewerKey: "Wrong reviewer key" });
       } else {
         if (error.details) {
           const fromServer = {};
@@ -78,9 +85,11 @@ export default function ReviewForm({ internshipId, onReviewed, onCancel }) {
       <Alert type="error">{submitError}</Alert>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormField label="Reviewer key *" name="reviewerKey" error={errors.reviewerKey} hint="Given to authorised reviewers only">
-          <input id="reviewerKey" name="reviewerKey" type="password" value={values.reviewerKey} onChange={handleChange} className={inputClass} autoComplete="off" />
-        </FormField>
+        {!savedKey && (
+          <FormField label="Reviewer key *" name="reviewerKey" error={errors.reviewerKey} hint="Given to authorised reviewers only">
+            <input id="reviewerKey" name="reviewerKey" type="password" value={values.reviewerKey} onChange={handleChange} className={inputClass} autoComplete="off" />
+          </FormField>
+        )}
         <FormField label="Your name *" name="reviewerName" error={errors.reviewerName}>
           <input id="reviewerName" name="reviewerName" value={values.reviewerName} onChange={handleChange} className={inputClass} />
         </FormField>
