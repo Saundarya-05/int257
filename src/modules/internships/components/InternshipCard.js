@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { WORK_MODE_LABELS } from "../constants";
 import { formatStipend, formatDuration, formatDate } from "../utils/format";
-
-// Temporary risk label. Module 2 can replace this with its own <RiskBadge />.
-const RISK_STYLES = {
-  low: "bg-green-100 text-green-800",
-  medium: "bg-yellow-100 text-yellow-800",
-  high: "bg-red-100 text-red-800",
-};
+import RiskBadge from "@/modules/verification/components/RiskBadge"; // Module 2 component
 
 // Props:
 //   internship → one object from the API
@@ -26,11 +20,7 @@ export default function InternshipCard({ internship, onDelete }) {
           <h3 className="text-lg font-semibold">{role}</h3>
           <p className="text-gray-600">{companyName}</p>
         </div>
-        {verification && (
-          <span className={`rounded-full px-2 py-1 text-xs font-medium ${RISK_STYLES[verification.finalStatus]}`}>
-            {verification.finalStatus} risk
-          </span>
-        )}
+        {verification && <RiskBadge status={verification.finalStatus} />}
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">

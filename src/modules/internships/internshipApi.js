@@ -1,31 +1,5 @@
 // The ONLY place where the browser talks to /api/internships.
-// Components call these functions and never write fetch() themselves.
-
-async function request(url, options = {}) {
-  let response;
-  try {
-    response = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store", // always get fresh data
-      ...options,
-    });
-  } catch {
-    // fetch() only throws when the network itself fails
-    throw new Error("Could not reach the server. Check your connection.");
-  }
-
-  const json = await response.json().catch(() => null);
-  if (!json) throw new Error("The server sent an unexpected response.");
-
-  if (!json.success) {
-    // Turn the API error into a normal JavaScript Error the UI can show.
-    const error = new Error(json.error.message);
-    error.code = json.error.code;
-    error.details = json.error.details; // [{ field, message }] for validation errors
-    throw error;
-  }
-  return json; // { success: true, data, meta? }
-}
+import { request } from "@/lib/apiClient";
 
 // params = { search, location, workMode, minStipend, sort, page, limit }
 export async function fetchInternships(params) {

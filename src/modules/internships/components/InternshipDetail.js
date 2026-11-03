@@ -8,6 +8,7 @@ import Alert from "@/components/ui/Alert";
 import { fetchInternship, deleteInternship } from "../internshipApi";
 import { WORK_MODE_LABELS } from "../constants";
 import { formatStipend, formatDuration, formatDate } from "../utils/format";
+import RiskSummary from "@/modules/verification/components/RiskSummary"; // Module 2 component
 
 const NOTICES = {
   created: "Internship added successfully!",
@@ -148,9 +149,10 @@ export default function InternshipDetail({ id, notice }) {
         </a>
       </section>
 
-      {/* ---------- Integration slots (do not remove) ----------
-          Module 2 owner: render <RiskSummary internshipId={i._id} /> here.
-          Module 3 owner: render <ExperienceList internshipId={i._id} /> here. */}
+      {/* Module 2: risk assessment */}
+      <RiskSummary internshipId={i._id} />
+
+      {/* Module 3 owner: render <ExperienceList internshipId={i._id} /> here. */}
     </div>
   );
 }
